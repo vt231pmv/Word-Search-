@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils/gridGenerator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/gridGenerator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module utils/gridGenerator
+ * @description Утиліта для генерації ігрового поля Word Search.
+ *              Розміщує слова горизонтально або вертикально та заповнює
+ *              порожні клітинки випадковими літерами українського алфавіту.
+ */
+
+/**
+ * Можливі напрямки розміщення слів.
+ * @constant {Array&lt;{r: number, c: number}>}
+ */
+const DIRECTIONS = [
+    { r: 0, c: 1 },
+    { r: 1, c: 0 },
+];
+
+/**
+ * Повертає випадкову літеру українського алфавіту.
+ *
+ * @function getRandomLetter
+ * @returns {string} Випадкова літера (А–Я, включаючи Ґ, Є, І, Ї).
+ */
+function getRandomLetter() {
+    const alphabet = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+    return alphabet[Math.floor(Math.random() * alphabet.length)];
+}
+
+/**
+ * Розміщує слова на ігровому полі у випадкових позиціях.
+ *
+ * @function placeWords
+ * @param {Array&lt;Array&lt;string|null>>} grid — 2D-масив сітки.
+ * @param {string[]} words — Слова для розміщення.
+ * @param {number} size — Розмір сітки.
+ * @returns {{grid: Array&lt;Array&lt;string>>, placedWords: string[]}} Оновлена сітка та список розміщених слів.
+ */
+function placeWords(grid, words, size) {
+    const placedWords = [];
+    for (const word of words) {
+        if (word.length > size) {
+            console.warn(`Word "${word}" is too long for grid size ${size} and was skipped.`);
+            continue;
+        }
+
+        let placed = false;
+        let attempts = 0;
+
+        while (!placed &amp;&amp; attempts &lt; 50) {
+            attempts++;
+            const direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            const rStart = Math.floor(Math.random() * size);
+            const cStart = Math.floor(Math.random() * size);
+
+            let r = rStart;
+            let c = cStart;
+            let fits = true;
+
+            for (let i = 0; i &lt; word.length; i++) {
+                if (r &lt; 0 || r >= size || c &lt; 0 || c >= size || (grid[r][c] !== null &amp;&amp; grid[r][c] !== word[i])) {
+                    fits = false;
+                    break;
+                }
+                r += direction.r;
+                c += direction.c;
+            }
+
+            if (fits) {
+                r = rStart;
+                c = cStart;
+                for (let i = 0; i &lt; word.length; i++) {
+                    grid[r][c] = word[i];
+                    r += direction.r;
+                    c += direction.c;
+                }
+                placed = true;
+                placedWords.push(word);
+            }
+        }
+    }
+    return { grid, placedWords };
+}
+
+/**
+ * Генерує ігрове поле з розміщеними словами та випадковими літерами.
+ *
+ * @function generateGrid
+ * @param {string[]} words — Слова для розміщення на полі.
+ * @param {number} [size=5] — Розмір сітки (size × size).
+ * @returns {{grid: string[], placedWords: string[]}} Плоский масив літер та список розміщених слів.
+ *
+ * @example
+ * const { grid, placedWords } = generateGrid(['МРІЯ', 'НЕБО'], 5);
+ */
+export function generateGrid(words, size = 5) {
+    let newGrid = Array(size).fill(null).map(() => Array(size).fill(null));
+
+    const { grid, placedWords } = placeWords(newGrid, words, size);
+
+    for (let r = 0; r &lt; size; r++) {
+        for (let c = 0; c &lt; size; c++) {
+            if (grid[r][c] === null) {
+                grid[r][c] = getRandomLetter();
+            }
+        }
+    }
+
+    return { grid: grid.flat(), placedWords: placedWords };
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-components_Game_LetterTile.html">components/Game/LetterTile</a></li><li><a href="module-components_Game_WordGrid.html">components/Game/WordGrid</a></li><li><a href="module-components_Game_WordList.html">components/Game/WordList</a></li><li><a href="module-components_UI_Button.html">components/UI/Button</a></li><li><a href="module-components_UI_Modal.html">components/UI/Modal</a></li><li><a href="module-hooks_useWordSearch.html">hooks/useWordSearch</a></li><li><a href="module-store_slices_leaderboardSlice.html">store/slices/leaderboardSlice</a></li><li><a href="module-store_slices_settingsSlice.html">store/slices/settingsSlice</a></li><li><a href="module-store_store.html">store/store</a></li><li><a href="module-utils_gridGenerator.html">utils/gridGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CookiePopup">CookiePopup</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Feb 21 2026 10:42:19 GMT+0200 (за східноєвропейським стандартним часом)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

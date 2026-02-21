@@ -1,0 +1,17 @@
+{
+    "source": {
+        "include": ["src/"],
+        "includePattern": ".+\\.jsx?$",
+        "excludePattern": "(node_modules|stories)"
+    },
+    "opts": {
+        "destination": "docs/",
+        "recurse": true,
+        "readme": "README.md"
+    },
+    "plugins": ["plugins/markdown"],
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": false
+    }
+}
